@@ -26,26 +26,62 @@ class TelloYOLOController:
         
         # 클래스별 동작 매핑
         self.class_actions = {
-            0: self.drone.takeoff,  # 클래스 0: 이륙
-            1: self.drone.land,     # 클래스 1: 착륙
-            2: lambda: self.drone.move_forward(self.speed),  # 클래스 2: 전진
-            3: lambda: self.drone.move_back(self.speed),     # 클래스 3: 후진
-            4: lambda: self.drone.move_left(self.speed),     # 클래스 4: 좌이동
-            5: lambda: self.drone.move_right(self.speed),    # 클래스 5: 우이동
-            6: lambda: self.drone.move_up(self.speed),       # 클래스 6: 상승
-            7: lambda: self.drone.move_down(self.speed),     # 클래스 7: 하강
+            0: self.drone.takeoff,      # A: 이륙
+            1: self.drone.land,         # B: 착륙
+            2: lambda: self.drone.move_forward(self.speed),  # C: 전진
+            3: lambda: self.drone.move_back(self.speed),     # D: 후진
+            4: lambda: self.drone.move_left(self.speed),     # E: 좌이동
+            5: lambda: self.drone.move_right(self.speed),    # F: 우이동
+            6: lambda: self.drone.move_up(self.speed),       # G: 상승
+            7: lambda: self.drone.move_down(self.speed),     # H: 하강
+            8: lambda: self.drone.rotate_clockwise(90),      # I: 시계방향 회전
+            9: lambda: self.drone.rotate_counter_clockwise(90),  # J: 반시계방향 회전
+            10: lambda: self.drone.flip_forward(),           # K: 전방 회전
+            11: lambda: self.drone.flip_back(),              # L: 후방 회전
+            12: lambda: self.drone.flip_left(),              # M: 좌측 회전
+            13: lambda: self.drone.flip_right(),             # N: 우측 회전
+            14: lambda: self.drone.move_forward(self.speed * 2),  # O: 빠른 전진
+            15: lambda: self.drone.move_back(self.speed * 2),     # P: 빠른 후진
+            16: lambda: self.drone.move_left(self.speed * 2),     # Q: 빠른 좌이동
+            17: lambda: self.drone.move_right(self.speed * 2),    # R: 빠른 우이동
+            18: lambda: self.drone.move_up(self.speed * 2),       # S: 빠른 상승
+            19: lambda: self.drone.move_down(self.speed * 2),     # T: 빠른 하강
+            20: lambda: self.drone.rotate_clockwise(180),         # U: 180도 회전
+            21: lambda: self.drone.rotate_counter_clockwise(180), # V: 180도 반회전
+            22: lambda: self.drone.move_forward(self.speed * 3),  # W: 매우 빠른 전진
+            23: lambda: self.drone.move_back(self.speed * 3),     # X: 매우 빠른 후진
+            24: lambda: self.drone.move_left(self.speed * 3),     # Y: 매우 빠른 좌이동
+            25: lambda: self.drone.move_right(self.speed * 3),    # Z: 매우 빠른 우이동
         }
         
-        # 클래스 이름 매핑 (실제 학습된 클래스 이름으로 수정 필요)
+        # 클래스 이름 매핑
         self.class_names = {
-            0: "takeoff",
-            1: "land",
-            2: "forward",
-            3: "back",
-            4: "left",
-            5: "right",
-            6: "up",
-            7: "down"
+            0: "A (이륙)",
+            1: "B (착륙)",
+            2: "C (전진)",
+            3: "D (후진)",
+            4: "E (좌이동)",
+            5: "F (우이동)",
+            6: "G (상승)",
+            7: "H (하강)",
+            8: "I (시계방향 회전)",
+            9: "J (반시계방향 회전)",
+            10: "K (전방 회전)",
+            11: "L (후방 회전)",
+            12: "M (좌측 회전)",
+            13: "N (우측 회전)",
+            14: "O (빠른 전진)",
+            15: "P (빠른 후진)",
+            16: "Q (빠른 좌이동)",
+            17: "R (빠른 우이동)",
+            18: "S (빠른 상승)",
+            19: "T (빠른 하강)",
+            20: "U (180도 회전)",
+            21: "V (180도 반회전)",
+            22: "W (매우 빠른 전진)",
+            23: "X (매우 빠른 후진)",
+            24: "Y (매우 빠른 좌이동)",
+            25: "Z (매우 빠른 우이동)"
         }
 
     def get_frame(self):
@@ -109,7 +145,20 @@ class TelloYOLOController:
         """메인 실행 루프"""
         try:
             print("프로그램 시작")
-            print("감지된 객체에 따라 드론이 자동으로 동작합니다.")
+            print("수화 알파벳에 따라 드론이 자동으로 동작합니다.")
+            print("A: 이륙, B: 착륙")
+            print("C: 전진, D: 후진")
+            print("E: 좌이동, F: 우이동")
+            print("G: 상승, H: 하강")
+            print("I: 시계방향 회전, J: 반시계방향 회전")
+            print("K: 전방 회전, L: 후방 회전")
+            print("M: 좌측 회전, N: 우측 회전")
+            print("O: 빠른 전진, P: 빠른 후진")
+            print("Q: 빠른 좌이동, R: 빠른 우이동")
+            print("S: 빠른 상승, T: 빠른 하강")
+            print("U: 180도 회전, V: 180도 반회전")
+            print("W: 매우 빠른 전진, X: 매우 빠른 후진")
+            print("Y: 매우 빠른 좌이동, Z: 매우 빠른 우이동")
             print("q: 종료")
             
             while True:
