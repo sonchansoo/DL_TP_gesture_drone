@@ -409,6 +409,7 @@ class TelloYOLOController:
         finally:
             # 정리
             self.drone.land()
+            self.drone.end()
             self.cap.release()
             cv2.destroyAllWindows()
             print("프로그램 종료")
