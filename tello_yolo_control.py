@@ -12,7 +12,7 @@ class TelloYOLOController:
         print(f"배터리 잔량: {self.drone.get_battery()}%")
         
         # YOLO 모델 로드
-        self.model = YOLO("/Users/sonchansoo/Desktop/test/best1.pt")
+        self.model = YOLO("/Users/sonchansoo/Desktop/test/best_float32.tflite")
         
         # 노트북 카메라 설정
         self.cap = cv2.VideoCapture(0)

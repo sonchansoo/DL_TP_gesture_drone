@@ -47,33 +47,81 @@
 # # Release resources
 # cap.release()
 # cv2.destroyAllWindows()
+
 import cv2
-from ultralytics import YOLO
+import numpy as np
+import tensorflow as tf
+import os
 
-# 1) TFLite 모델 경로를 지정해 YOLO 객체 생성
-model = YOLO("/Users/sonchansoo/Desktop/test/best1.pt")
+# 혼동 행렬 이미지에서 클래스 이름 목록을 추출하여 정의합니다.
+class_names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
-# 2) 웹캠 열기
+# TFLite 모델 경로 (상대 경로)
+model_path = "/Users/sonchansoo/Desktop/test/best_float32.tflite"
+
+# 모델 로딩
+try:
+    interpreter = tf.lite.Interpreter(model_path=model_path)
+    interpreter.allocate_tensors()
+    print("모델을 성공적으로 로드했습니다.")
+
+except Exception as e:
+    print(f"모델 로딩에 실패했습니다: {e}")
+    exit()
+
+# 입력 및 출력 세부 정보를 가져옵니다.
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+# 입력 이미지 크기를 모델에 맞게 가져옵니다.
+input_height = input_details[0]['shape'][1]
+input_width = input_details[0]['shape'][2]
+
+# 웹캠을 설정합니다.
 cap = cv2.VideoCapture(0)
 
-while True:
+if not cap.isOpened():
+    print("웹캠을 열 수 없습니다.")
+    exit()
+
+while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
-        print("Failed to grab frame")
+        print("프레임을 가져오는 데 실패했습니다.")
         break
 
-    # 3) YOLO(TFLite) 예측 → results 에는 검출된 객체들 정보가 들어있음
-    results = model(frame)  # frame을 넘기면 내부에서 640×640 리사이징, 정규화, NMS까지 전부 처리
+    # 프레임을 전처리합니다: 크기 조정 및 정규화
+    img = cv2.resize(frame, (input_width, input_height))
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img_rgb = img_rgb.astype(np.float32) / 255.0
+    input_data = np.expand_dims(img_rgb, axis=0)
 
-    # 4) 검출 결과 시각화
-    annotated_frame = results[0].plot()  
-    #   results[0].boxes, results[0].masks, results[0].keypoints 등을 plot()으로 함께 그려줌
+    # 추론을 수행합니다.
+    interpreter.set_tensor(input_details[0]['index'], input_data)
+    interpreter.invoke()
 
-    cv2.imshow("YOLO TFLite Detect", annotated_frame)
+    # 예측 결과를 가져옵니다.
+    output_data = interpreter.get_tensor(output_details[0]['index'])[0]
 
-    # 5) 'q' 입력 시 종료
+    # 가장 높은 확률을 가진 클래스의 인덱스를 찾습니다.
+    predicted_index = np.argmax(output_data)
+    
+    # 해당 클래스의 이름과 신뢰도(확률)를 가져옵니다.
+    label = class_names[predicted_index]
+    confidence = output_data[predicted_index]
+
+    # 프레임에 결과를 표시합니다.
+    display_text = f"{label}: {confidence:.2f}"
+    cv2.putText(frame, display_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+
+    # 예측 결과가 있는 프레임을 보여줍니다.
+    cv2.imshow('Webcam Classification', frame)
+
+    # 'q' 키를 누르면 종료합니다.
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+# 리소스를 해제합니다.
 cap.release()
 cv2.destroyAllWindows()
+
